@@ -67,6 +67,16 @@ class NeuralNetwork:
 
         return self.output_layer.getOutput()
 
+    def learn(self, input_data):
+        print input_data
+
+        # 出力値
+        output_data = self.commit([input_data[0], input_data[1]])
+        # 正解値
+        correct_value = input_data[2]
+
+        print correct_value - output_data
+
 
 # 基準点（データの範囲を0.0-1.0の範囲に収めるため）
 refer_point_0 = 34.5
@@ -82,6 +92,9 @@ training_data_file.close()
 
 # ニューラルネットワークのインスタンス
 neural_network = NeuralNetwork()
+
+# 学習
+neural_network.learn(training_data[0])
 
 # 訓練用データの表示の準備
 position_tokyo_learning = [[], []]

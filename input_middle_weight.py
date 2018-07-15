@@ -67,6 +67,41 @@ class NeuralNetwork:
 
         return self.output_layer.getOutput()
 
+    def learn(self, input_data):
+        print input_data
+
+        # 出力値
+        output_data = self.commit([input_data[0], input_data[1]])
+        # 正解値
+        correct_value = input_data[2]
+
+        # 学習係数
+        k = 0.3
+
+        # 出力層→中間層
+        # δmo = (正解値　- 出力値) * 出力値のシグモイド関数の微分
+        delta_w_mo = (correct_value - output_data) * output_data * (1.0 - output_data)
+        old_w_mo = list(self.w_mo)
+
+        # 修正量 = 中間層の値 * δmo * 学習係数
+        self.w_mo[0] += self.middle_layer[0].output * delta_w_mo * k
+        self.w_mo[1] += self.middle_layer[1].output * delta_w_mo * k
+        self.w_mo[2] += self.middle_layer[2] * delta_w_mo * k
+
+        # δim = δmo * 中間出力の重み * 中間層の微分
+        # 修正量 = δim * 入力層の値 * 学習係数
+        # すべての層の修正が可能
+        delta_w_im = [
+            delta_w_mo * old_w_mo[0] * self.middle_layer[0].output * (1.0 - self.middle_layer[0].output),
+            delta_w_mo * old_w_mo[1] * self.middle_layer[1].output * (1.0 - self.middle_layer[1].output)
+        ]
+        self.w_im[0][0] += self.input_layer[0] * delta_w_im[0] * k
+        self.w_im[0][1] += self.input_layer[0] * delta_w_im[1] * k
+        self.w_im[1][0] += self.input_layer[1] * delta_w_im[0] * k
+        self.w_im[1][1] += self.input_layer[1] * delta_w_im[1] * k
+        self.w_im[2][0] += self.input_layer[2] * delta_w_im[0] * k
+        self.w_im[2][1] += self.input_layer[2] * delta_w_im[1] * k
+
 
 # 基準点（データの範囲を0.0-1.0の範囲に収めるため）
 refer_point_0 = 34.5
@@ -82,6 +117,12 @@ training_data_file.close()
 
 # ニューラルネットワークのインスタンス
 neural_network = NeuralNetwork()
+
+# 学習
+neural_network.learn(training_data[0])
+print neural_network.w_im
+print neural_network.w_mo
+
 
 # 訓練用データの表示の準備
 position_tokyo_learning = [[], []]
